@@ -18,7 +18,7 @@ class Event():
         print "my error stop"
 
 class Client(asyncore.dispatcher):
-  
+    scheduler=asyncore_scheduler.Scheduler()  
     def __init__(self, host, port, login, password):
         self.custom_handlers()
         self.host=host
@@ -27,7 +27,7 @@ class Client(asyncore.dispatcher):
         self.password=password
         self.cutted_line=''
         self.task1=asyncore_scheduler.Task(start=2, repeatable=True, interval=3, function=self.send_ping)
-        self.scheduler=asyncore_scheduler.Scheduler()
+        
         self.scheduler.addTask(self.task1)
         self.Auth()
         
