@@ -8,10 +8,10 @@ import errno
 import asyncore_scheduler
 
 class Event():
-    def connected(self):
-        print 'Connected'
-    def disconnected(self):
-        print 'Disconnected'
+    def connected(self, server=None):
+        print 'Connected to %s' % server
+    def disconnected(self, server=None):
+        print 'Disconnected from %s' % server
     def error(self):
         print "my error start"
         print traceback.format_exc()
@@ -30,7 +30,9 @@ class Client(asyncore.dispatcher):
         
         self.scheduler.addTask(self.task1)
         self.Auth()
-        
+        self.custom_init()
+    def custom_init(self):
+        pass
     def read_event(self, data):
         print data
     
@@ -47,7 +49,7 @@ class Client(asyncore.dispatcher):
         self.connect( (self.host, self.port) )
         self.buffer = '%s\n%s\n' % (self.login,self.password)
         self.socket.settimeout(10.0)
-        self.event.connected()
+        self.event.connected(server=self.host)
     
     def handle_error(self):
         if socket.errno in ( errno.ECONNREFUSED, errno.ECONNABORTED, errno.ECONNRESET, errno.ENETUNREACH):
@@ -62,7 +64,7 @@ class Client(asyncore.dispatcher):
         
     def handle_close(self):
         self.close()
-        self.event.disconnected()
+        self.event.disconnected(server=self.host)
         sleep(10)
         self.buffer=''
         self.Auth()
