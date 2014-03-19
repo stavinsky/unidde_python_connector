@@ -4,7 +4,7 @@ import params
 class MyClient(uniddeconnector.Client):
     def read_event(self,data):
         print data
-                
+
 
 
 

@@ -6,7 +6,7 @@ import socket
 import errno
 from sys import path
 path.append('../asyncore_scheduler')
-import asyncore_scheduler
+from asyncore_scheduler import Task, Scheduler
 
 
 class Event():
@@ -24,7 +24,7 @@ class Event():
 
 
 class Client(asyncore.dispatcher):
-    scheduler = asyncore_scheduler.Scheduler()
+    scheduler = Scheduler()
 
     def __init__(self, host, port, login, password, event=Event(), **kwargs):
         self.kwargs = kwargs
@@ -35,7 +35,7 @@ class Client(asyncore.dispatcher):
         self.login = login
         self.password = password
         self.cutted_line = ''
-        self.task1 = asyncore_scheduler.Task(start=2, repeatable=True, interval=3, function=self.send_ping)
+        self.task1 = Task(start=2, repeatable=True, interval=3, function=self.send_ping)
         self.scheduler.addTask(self.task1)
         self.Auth()
         self.custom_init()
