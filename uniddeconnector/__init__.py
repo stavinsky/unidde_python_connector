@@ -26,8 +26,10 @@ class Event():
 class Client(asyncore.dispatcher):
     scheduler = asyncore_scheduler.Scheduler()
 
-    def __init__(self, host, port, login, password):
+    def __init__(self, host, port, login, password, event=Event(), **kwargs):
+        self.kwargs = kwargs
         self.custom_handlers()
+        self.event = event
         self.host = host
         self.port = port
         self.login = login
@@ -57,27 +59,30 @@ class Client(asyncore.dispatcher):
         self.connect((self.host, self.port))
         self.buffer = '%s\n%s\n' % (self.login, self.password)
         self.socket.settimeout(10.0)
-        Event.connected(server=self.host)
+        self.event.connected(server=self.host)
 
     def handle_error(self):
         if socket.errno in ( errno.ECONNREFUSED, errno.ECONNABORTED, errno.ECONNRESET, errno.ENETUNREACH):
-            Event.error()
+            self.event.error()
             sleep(10)
             return
-        Event.error()
+        self.event.error()
 
     def handle_connect(self):
         pass
 
     def handle_close(self):
         self.close()
-        Event.disconnected(server=self.host)
+        self.event.disconnected(server=self.host)
         sleep(10)
         self.buffer = ''
         self.Auth()
 
     def handle_read(self):
         raw = self.recv(8192)
+        if "Access denied" in raw:
+            print "Access denied %s", self.host
+            return
         if self.cutted_line != '':
             raw = self.cutted_line + raw
             self.cutted_line = ''
