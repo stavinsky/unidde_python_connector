@@ -27,8 +27,7 @@ class Client(asyncore.dispatcher):
     scheduler = Scheduler()
 
     def __init__(self, host, port, login, password, event=Event(), **kwargs):
-        self.kwargs = kwargs
-        self.custom_handlers()
+
         self.event = event
         self.host = host
         self.port = port
@@ -38,6 +37,8 @@ class Client(asyncore.dispatcher):
         self.task1 = Task(start=2, repeatable=True, interval=3, function=self.send_ping)
         self.scheduler.addTask(self.task1)
         self.Auth()
+        self.kwargs = kwargs
+        self.custom_handlers()
         self.custom_init()
 
     def custom_init(self):
